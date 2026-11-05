@@ -1,0 +1,67 @@
+name: gestion-urbana
+
+services:
+  db:
+    image: mariadb:11.4
+    restart: unless-stopped
+    command:
+      - --innodb-buffer-pool-size=32M
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    environment:
+      MARIADB_DATABASE: gestion_urbana
+      MARIADB_USER: urbano_user
+      MARIADB_PASSWORD: ${DB_PASSWORD}
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      TZ: America/La_Paz
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - interna
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      retries: 20
+
+  web:
+    image: wordpress:6.8-php8.3-apache
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    entrypoint:
+      - sh
+      - -c
+      - |
+        printf 'upload_max_filesize=10M\npost_max_size=12M\nmemory_limit=256M\ndate.timezone=America/La_Paz\n' > /usr/local/etc/php/conf.d/urbano.ini
+        mkdir -p /var/www/html/uploads/respuestas
+        chown -R www-data:www-data /var/www/html/uploads
+        exec apache2-foreground
+    environment:
+      DB_HOST: db
+      DB_NAME: gestion_urbana
+      DB_USER: urbano_user
+      DB_PASS: ${DB_PASSWORD}
+      TZ: America/La_Paz
+    volumes:
+      - ./app:/var/www/html
+    networks:
+      - interna
+      - traefik
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=regysweb-prod_default
+      - traefik.http.routers.gestion-urbana.rule=Host(`srv2041080.hstgr.cloud`)
+      - traefik.http.routers.gestion-urbana.entrypoints=websecure
+      - traefik.http.routers.gestion-urbana.tls.certresolver=le
+      - traefik.http.services.gestion-urbana.loadbalancer.server.port=80
+
+volumes:
+  db_data:
+
+networks:
+  interna:
+  traefik:
+    name: regysweb-prod_default
+    external: true

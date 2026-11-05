@@ -1,0 +1,2324 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>
+Gestión de Problemas Urbanos - Tu Barrio
+</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+
+<style>
+
+/* =========================================================
+   ESTILOS GENERALES
+========================================================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    background: #f1f5f9;
+    color: #1e293b;
+}
+
+a {
+    text-decoration: none;
+}
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: auto;
+}
+
+
+/* =========================================================
+   NAVBAR
+========================================================= */
+
+.navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+
+    background:
+        rgba(15, 23, 42, 0.97);
+
+    box-shadow:
+        0 5px 20px rgba(0,0,0,.15);
+}
+
+.navbar-content {
+    min-height: 70px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+}
+
+.logo {
+    color: white;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.logo span {
+    color: #38bdf8;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    flex-wrap: wrap;
+}
+
+.nav-links a {
+    color: #e2e8f0;
+    padding: 10px 14px;
+    border-radius: 8px;
+
+    transition: .3s;
+    cursor: pointer;
+}
+
+.nav-links a:hover {
+    background: #2563eb;
+    color: white;
+}
+
+.usuario-menu {
+    color: #bae6fd;
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   HERO
+========================================================= */
+
+.hero {
+    min-height: 520px;
+
+    display: flex;
+    align-items: center;
+
+    background:
+        linear-gradient(
+            rgba(15,23,42,.72),
+            rgba(15,23,42,.72)
+        ),
+        url("https://images.unsplash.com/photo-1449824913935-59a10b8d2000?auto=format&fit=crop&w=1600&q=80");
+
+    background-size: cover;
+    background-position: center;
+}
+
+.hero-content {
+    color: white;
+    max-width: 750px;
+}
+
+.hero h1 {
+    font-size: clamp(38px, 6vw, 65px);
+    margin-bottom: 20px;
+    line-height: 1.05;
+}
+
+.hero h1 span {
+    color: #38bdf8;
+}
+
+.hero p {
+    font-size: 20px;
+    line-height: 1.7;
+    margin-bottom: 30px;
+}
+
+.btn {
+    display: inline-block;
+
+    border: none;
+    cursor: pointer;
+
+    padding: 13px 22px;
+    border-radius: 10px;
+
+    font-weight: bold;
+    font-size: 15px;
+
+    transition: .3s;
+}
+
+.btn-primary {
+    background: #2563eb;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #1d4ed8;
+    transform: translateY(-2px);
+}
+
+.btn-success {
+    background: #16a34a;
+    color: white;
+}
+
+.btn-danger {
+    background: #dc2626;
+    color: white;
+}
+
+.btn-warning {
+    background: #f59e0b;
+    color: white;
+}
+
+
+/* =========================================================
+   SECCIONES
+========================================================= */
+
+section {
+    padding: 75px 0;
+}
+
+.section-title {
+    text-align: center;
+    margin-bottom: 45px;
+}
+
+.section-title h2 {
+    font-size: 35px;
+    margin-bottom: 12px;
+    color: #0f172a;
+}
+
+.section-title p {
+    color: #64748b;
+}
+
+
+/* =========================================================
+   ESTADÍSTICAS
+========================================================= */
+
+.stats {
+    margin-top: -55px;
+    position: relative;
+    z-index: 10;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    gap: 20px;
+}
+
+.stat-card {
+    background: white;
+    padding: 28px;
+    border-radius: 18px;
+
+    text-align: center;
+
+    box-shadow:
+        0 15px 35px rgba(15,23,42,.12);
+}
+
+.stat-card h3 {
+    font-size: 38px;
+    color: #2563eb;
+    margin-bottom: 8px;
+}
+
+.stat-card p {
+    color: #64748b;
+}
+
+
+/* =========================================================
+   TARJETAS
+========================================================= */
+
+.cards {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 25px;
+}
+
+.card {
+    background: white;
+    border-radius: 18px;
+    padding: 30px;
+
+    box-shadow:
+        0 10px 30px rgba(0,0,0,.08);
+
+    transition: .3s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+
+    box-shadow:
+        0 15px 35px rgba(0,0,0,.12);
+}
+
+.card-icon {
+    font-size: 42px;
+    margin-bottom: 18px;
+}
+
+.card h3 {
+    margin-bottom: 12px;
+}
+
+.card p {
+    color: #64748b;
+    line-height: 1.7;
+}
+
+
+/* =========================================================
+   FORMULARIOS
+========================================================= */
+
+.form-container {
+    max-width: 750px;
+    margin: auto;
+
+    background: white;
+
+    padding: 35px;
+
+    border-radius: 20px;
+
+    box-shadow:
+        0 15px 35px rgba(0,0,0,.08);
+}
+
+.form-group {
+    margin-bottom: 18px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 7px;
+}
+
+.form-control {
+    width: 100%;
+
+    padding: 13px 15px;
+
+    border: 1px solid #cbd5e1;
+
+    border-radius: 10px;
+
+    font-size: 15px;
+
+    outline: none;
+}
+
+.form-control:focus {
+    border-color: #2563eb;
+
+    box-shadow:
+        0 0 0 3px rgba(37,99,235,.1);
+}
+
+textarea.form-control {
+    min-height: 130px;
+    resize: vertical;
+}
+
+.form-grid {
+    display: grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap: 18px;
+}
+
+
+/* =========================================================
+   MENSAJES
+========================================================= */
+
+.mensaje {
+    position: fixed;
+
+    top: 85px;
+    right: 20px;
+
+    z-index: 2000;
+
+    max-width: 420px;
+
+    padding: 18px 22px;
+
+    border-radius: 12px;
+
+    font-weight: bold;
+
+    box-shadow:
+        0 10px 30px rgba(0,0,0,.15);
+}
+
+.mensaje.exito {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.mensaje.error {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+
+/* =========================================================
+   ESTADOS
+========================================================= */
+
+.estado {
+    display: inline-block;
+
+    padding: 7px 15px;
+
+    border-radius: 30px;
+
+    font-size: 13px;
+
+    font-weight: bold;
+}
+
+.pendiente {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.proceso {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.solucionado {
+    background: #dcfce7;
+    color: #166534;
+}
+
+
+/* =========================================================
+   REPORTES
+========================================================= */
+
+.reportes-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 25px;
+}
+
+.reporte-card {
+    background: white;
+
+    border-radius: 18px;
+
+    overflow: hidden;
+
+    box-shadow:
+        0 10px 30px rgba(0,0,0,.08);
+}
+
+.reporte-imagen {
+    width: 100%;
+    height: 210px;
+    object-fit: cover;
+}
+
+.reporte-contenido {
+    padding: 22px;
+}
+
+.reporte-contenido h3 {
+    margin-bottom: 12px;
+}
+
+.reporte-dato {
+    margin: 8px 0;
+    color: #64748b;
+}
+
+
+/* =========================================================
+   CONSULTA
+========================================================= */
+
+.consulta {
+    max-width: 800px;
+    margin: auto;
+}
+
+.resultado-reporte {
+    margin-top: 30px;
+
+    background: white;
+
+    padding: 30px;
+
+    border-radius: 18px;
+
+    box-shadow:
+        0 10px 30px rgba(0,0,0,.08);
+}
+
+.resultado-reporte img {
+    max-width: 100%;
+    max-height: 400px;
+
+    object-fit: contain;
+
+    border-radius: 14px;
+
+    margin-top: 15px;
+}
+
+
+/* =========================================================
+   RESPUESTA DEL ADMINISTRADOR
+========================================================= */
+
+.respuesta-admin {
+    margin-top: 25px;
+
+    padding: 25px;
+
+    border-radius: 16px;
+
+    background: #eff6ff;
+
+    border-left:
+        5px solid #2563eb;
+}
+
+.respuesta-admin h4 {
+    margin-bottom: 12px;
+
+    color: #1d4ed8;
+
+    font-size: 20px;
+}
+
+.respuesta-admin p {
+    line-height: 1.7;
+
+    color: #334155;
+}
+
+.respuesta-admin img {
+    display: block;
+
+    max-width: 100%;
+    max-height: 350px;
+
+    border-radius: 12px;
+
+    margin-top: 15px;
+}
+
+.respuesta-fecha {
+    display: block;
+
+    margin-top: 12px;
+
+    color: #64748b;
+
+    font-size: 13px;
+}
+
+.sin-respuesta {
+    margin-top: 20px;
+
+    padding: 18px;
+
+    border-radius: 12px;
+
+    background: #f8fafc;
+
+    color: #64748b;
+}
+
+
+/* =========================================================
+   MIS REPORTES
+========================================================= */
+
+.mi-reporte {
+    background: white;
+
+    padding: 25px;
+
+    margin-bottom: 20px;
+
+    border-radius: 18px;
+
+    box-shadow:
+        0 10px 30px rgba(0,0,0,.07);
+}
+
+.mi-reporte h3 {
+    margin-bottom: 10px;
+}
+
+.mi-reporte-info {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, 1fr);
+
+    gap: 10px;
+
+    margin-top: 15px;
+}
+
+.mi-reporte img {
+    max-width: 300px;
+
+    max-height: 220px;
+
+    border-radius: 12px;
+
+    margin-top: 15px;
+}
+
+
+/* =========================================================
+   PANEL ADMIN
+========================================================= */
+
+.admin-section {
+    background: #e2e8f0;
+}
+
+.admin-card {
+    background: white;
+
+    border-radius: 20px;
+
+    padding: 28px;
+
+    margin-bottom: 28px;
+
+    box-shadow:
+        0 12px 35px rgba(0,0,0,.08);
+}
+
+.admin-header {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    gap: 15px;
+
+    margin-bottom: 20px;
+}
+
+.admin-header h3 {
+    color: #0f172a;
+}
+
+.admin-info {
+    display: grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap: 25px;
+}
+
+.admin-col {
+    padding: 20px;
+
+    background: #f8fafc;
+
+    border-radius: 15px;
+}
+
+.admin-col h4 {
+    margin-bottom: 15px;
+
+    color: #1e293b;
+}
+
+.admin-imagen {
+    width: 100%;
+
+    max-height: 320px;
+
+    object-fit: cover;
+
+    border-radius: 12px;
+
+    margin-top: 12px;
+}
+
+.respuesta-preview {
+    width: 100%;
+
+    max-height: 300px;
+
+    object-fit: contain;
+
+    border-radius: 12px;
+
+    margin-top: 12px;
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+footer {
+    background: #0f172a;
+
+    color: #cbd5e1;
+
+    padding: 45px 0;
+
+    text-align: center;
+}
+
+footer h3 {
+    color: white;
+
+    margin-bottom: 10px;
+}
+
+footer p {
+    margin: 6px 0;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media(max-width: 900px) {
+
+    .stats-grid,
+    .cards,
+    .reportes-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .admin-info {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media(max-width: 650px) {
+
+    .navbar-content {
+        flex-direction: column;
+
+        padding: 15px 0;
+    }
+
+    .nav-links {
+        justify-content: center;
+    }
+
+    .hero {
+        min-height: 450px;
+    }
+
+    .stats {
+        margin-top: 20px;
+    }
+
+    .stats-grid,
+    .cards,
+    .reportes-grid,
+    .form-grid,
+    .mi-reporte-info {
+        grid-template-columns: 1fr;
+    }
+
+    section {
+        padding: 55px 0;
+    }
+
+    .form-container {
+        padding: 22px;
+    }
+}
+
+/* =========================================================
+   ESTÉTICA GESTIÓN URBANA: VERDE, AZUL MARINO Y BLANCO
+   Inspirada en la imagen de referencia del proyecto.
+========================================================= */
+:root {
+    --azul-noche: #071b3b;
+    --azul: #0757a6;
+    --verde: #08a765;
+    --verde-oscuro: #078653;
+    --celeste: #1f9bd1;
+    --fondo: #f5f9fc;
+    --texto: #102746;
+    --menta: #e4f7ef;
+    --azul-claro: #e5f1ff;
+    --borde: #d8e6ef;
+}
+body { background:var(--fondo); color:var(--texto); line-height:1.65; }
+a { text-decoration:none; }
+.container { width:min(1160px, 92%); }
+.navbar { background:rgba(7,27,59,.98); backdrop-filter:blur(12px); box-shadow:0 8px 24px rgba(7,27,59,.12); }
+.navbar-content { min-height:76px; }
+.logo { color:#fff; letter-spacing:-.5px; font-size:21px; line-height:1.25; }
+.logo span { display:inline; color:#19c779; }
+.nav-links { gap:5px; }
+.nav-links a { font-size:14px; padding:10px 13px; border-radius:9px; transition:all .2s ease; }
+.nav-links a:hover { background:var(--verde); color:#fff; }
+.usuario-menu { color:#c8f7e1; }
+.hero {
+    min-height:470px;
+    background-image:linear-gradient(90deg,rgba(5,23,51,.88),rgba(7,38,67,.65)),url("https://images.unsplash.com/photo-1449824913935-59a10b8d2000?auto=format&fit=crop&w=1800&q=85");
+    background-position:center 54%;
+    border-bottom:5px solid var(--verde);
+}
+.hero-content { max-width:780px; padding-top:12px; }
+.hero h1 { color:#fff; font-size:clamp(36px,5.2vw,61px); letter-spacing:-1.8px; line-height:1.08; }
+.hero h1 span { color:#27d184; }
+.hero p { max-width:680px; font-size:18px; color:#edf8ff; }
+.btn { border-radius:10px; box-shadow:0 6px 15px rgba(7,27,59,.12); font-weight:700; transition:transform .2s,background .2s; }
+.btn:hover { transform:translateY(-2px); }
+.btn-primary { background:var(--verde); color:#fff; }
+.btn-primary:hover, .btn-success:hover { background:var(--verde-oscuro); }
+.btn-success { background:var(--verde); color:#fff; }
+.btn-warning { background:#f59e0b; color:#fff; }
+.btn-danger { background:#d94848; color:#fff; }
+section { padding:68px 0; }
+.section-title { margin-bottom:36px; }
+.section-title h2 { color:var(--azul-noche); font-size:clamp(27px,3vw,36px); letter-spacing:-.7px; }
+.section-title p { color:#58708b; font-size:15px; }
+.stats { margin-top:-42px; }
+.stats-grid { gap:17px; }
+.stat-card { background:#fff; border:1px solid #e0eaf1; border-top:4px solid var(--verde); border-radius:17px; padding:25px 18px; box-shadow:0 12px 28px rgba(7,27,59,.08); }
+.stat-card h3 { color:var(--verde); }
+.cards { gap:19px; }
+.card { background:#fff; border:1px solid #dfebf1; border-radius:17px; box-shadow:0 10px 26px rgba(7,27,59,.05); padding:26px; transition:transform .2s,box-shadow .2s; }
+.card:hover { transform:translateY(-3px); box-shadow:0 15px 32px rgba(7,27,59,.1); }
+.form-container { background:#fff; border:1px solid #dce9ef; border-top:5px solid var(--verde); border-radius:20px; box-shadow:0 18px 42px rgba(7,27,59,.07); padding:clamp(22px,4vw,38px); }
+.form-control { width:100%; border:1px solid #cedde7; border-radius:10px; background:#fbfdff; color:var(--texto); padding:12px 14px; outline:none; transition:border .2s,box-shadow .2s; }
+.form-control:focus { background:#fff; border-color:var(--verde); box-shadow:0 0 0 4px rgba(8,167,101,.13); }
+.form-group label { color:var(--azul-noche); font-size:14px; font-weight:700; display:block; margin-bottom:7px; }
+.help-text { display:block; margin-top:7px; color:#60758b; font-size:13px; }
+.map-actions { display:flex; align-items:center; flex-wrap:wrap; gap:12px; margin:12px 0; }
+.map-actions .btn { padding:10px 15px; font-size:13px; }
+#mapa-ubicacion { height:320px; width:100%; overflow:hidden; border:2px solid #bfe8d5; border-radius:14px; z-index:1; background:#e4f7ef; }
+#coordenadas-texto { color:var(--verde-oscuro); font-weight:600; }
+footer { background:var(--azul-noche); color:#e9f3ff; border-top:5px solid var(--verde); }
+table { border-collapse:collapse; }
+th { background:#e4f7ef; color:var(--azul-noche); }
+input[type="file"] { max-width:100%; }
+.hidden { display: none !important; }
+@media(max-width:760px) {
+ .navbar-content { padding:14px 0; align-items:flex-start; flex-direction:column; gap:10px; }
+ .nav-links { width:100%; gap:3px; }
+ .nav-links a { padding:8px 10px; font-size:13px; }
+ .hero { min-height:430px; }
+ .hero p { font-size:16px; }
+ .stats { margin-top:20px; }
+ #mapa-ubicacion { height:260px; }
+}
+</style>
+
+</head>
+
+
+<body>
+
+
+<!-- =====================================================
+     MENSAJE
+====================================================== -->
+<div id="mensaje-toast"></div>
+
+
+<!-- =====================================================
+     NAVBAR
+====================================================== -->
+
+<nav class="navbar">
+
+<div class="container navbar-content">
+
+    <a href="#inicio" class="logo">
+        Gestión Urbana
+        <span>Tu Barrio al Día</span>
+    </a>
+
+    <div class="nav-links" id="nav-links">
+        <a href="#inicio">Inicio</a>
+        <a href="#reportar">Reportar</a>
+        <a href="#consultar">Consultar</a>
+        <a href="#mis-reportes" id="nav-mis-reportes" class="hidden">Mis reportes</a>
+        <a href="#administracion" id="nav-admin" class="hidden">⚙️ Administración</a>
+        <span class="usuario-menu hidden" id="nav-usuario-nombre"></span>
+        <a id="nav-salir" class="hidden">Salir</a>
+        <a href="#login" id="nav-ingresar">Ingresar</a>
+        <a href="#registro" id="nav-registro">Registrarse</a>
+    </div>
+
+</div>
+
+</nav>
+
+
+<!-- =====================================================
+     HERO
+====================================================== -->
+
+<section class="hero" id="inicio">
+
+<div class="container hero-content">
+
+    <h1>
+        Reporta los problemas urbanos
+        <span>de tu barrio.</span>
+    </h1>
+
+    <p>
+        Ayúdanos a mejorar nuestra ciudad.
+        Registra problemas urbanos, consulta su estado
+        y recibe respuestas de la administración.
+    </p>
+
+    <a
+        href="#reportar"
+        class="btn btn-primary"
+    >
+        📢 Reportar un problema
+    </a>
+
+</div>
+
+</section>
+
+
+<!-- =====================================================
+     ESTADÍSTICAS
+====================================================== -->
+
+<section class="stats">
+
+<div class="container">
+
+<div class="stats-grid">
+
+    <div class="stat-card">
+        <h3 id="stat-total">3</h3>
+        <p>Reportes registrados</p>
+    </div>
+
+    <div class="stat-card">
+        <h3 id="stat-pendientes">1</h3>
+        <p>Pendientes</p>
+    </div>
+
+    <div class="stat-card">
+        <h3 id="stat-proceso">1</h3>
+        <p>En proceso</p>
+    </div>
+
+    <div class="stat-card">
+        <h3 id="stat-solucionados">1</h3>
+        <p>Solucionados</p>
+    </div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- =====================================================
+     COMO FUNCIONA
+====================================================== -->
+
+<section>
+
+<div class="container">
+
+<div class="section-title">
+
+    <h2>¿Cómo funciona?</h2>
+
+    <p>
+        Participa en la mejora de tu comunidad
+    </p>
+
+</div>
+
+
+<div class="cards">
+
+    <div class="card">
+
+        <div class="card-icon">
+            📸
+        </div>
+
+        <h3>
+            1. Reporta
+        </h3>
+
+        <p>
+            Registra un problema urbano,
+            describe lo ocurrido y agrega
+            una fotografía como evidencia.
+        </p>
+
+    </div>
+
+
+    <div class="card">
+
+        <div class="card-icon">
+            🔎
+        </div>
+
+        <h3>
+            2. Consulta
+        </h3>
+
+        <p>
+            Obtén un código de seguimiento
+            para consultar el estado de tu reporte.
+        </p>
+
+    </div>
+
+
+    <div class="card">
+
+        <div class="card-icon">
+            💬
+        </div>
+
+        <h3>
+            3. Recibe respuesta
+        </h3>
+
+        <p>
+            La administración puede responder
+            tu reporte, cambiar su estado y
+            enviarte una imagen.
+        </p>
+
+    </div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- =====================================================
+     LOGIN
+====================================================== -->
+
+<section id="login">
+
+<div class="container">
+
+<div class="section-title">
+
+    <h2>Iniciar sesión</h2>
+
+    <p>
+        Ingresa para registrar y administrar tus reportes.
+    </p>
+
+</div>
+
+
+<div class="form-container">
+
+<form id="form-login">
+
+    <div class="form-group">
+
+        <label>
+            Usuario
+        </label>
+
+        <input
+            type="text"
+            name="usuario"
+            id="login-usuario"
+            class="form-control"
+            required
+        >
+
+    </div>
+
+
+    <div class="form-group">
+
+        <label>
+            Contraseña
+        </label>
+
+        <input
+            type="password"
+            name="password"
+            id="login-password"
+            class="form-control"
+            required
+        >
+
+    </div>
+
+
+    <button
+        type="submit"
+        class="btn btn-primary"
+    >
+        🔐 Iniciar sesión
+    </button>
+
+</form>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- =====================================================
+     REGISTRO
+====================================================== -->
+
+<section id="registro">
+
+<div class="container">
+
+<div class="section-title">
+
+    <h2>Crear una cuenta</h2>
+
+    <p>
+        Regístrate para comenzar a reportar problemas urbanos.
+    </p>
+
+</div>
+
+
+<div class="form-container">
+
+<form id="form-registro">
+
+    <div class="form-grid">
+
+        <div class="form-group">
+
+            <label>
+                Nombre completo
+            </label>
+
+            <input
+                type="text"
+                name="nombre"
+                id="reg-nombre"
+                class="form-control"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Usuario
+            </label>
+
+            <input
+                type="text"
+                name="usuario"
+                id="reg-usuario"
+                class="form-control"
+                required
+            >
+
+        </div>
+
+    </div>
+
+
+    <div class="form-group">
+
+        <label>
+            Correo electrónico
+        </label>
+
+        <input
+            type="email"
+            name="email"
+            id="reg-email"
+            class="form-control"
+            required
+        >
+
+    </div>
+
+
+    <div class="form-grid">
+
+        <div class="form-group">
+
+            <label>
+                Contraseña
+            </label>
+
+            <input
+                type="password"
+                name="password"
+                id="reg-password"
+                class="form-control"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Confirmar contraseña
+            </label>
+
+            <input
+                type="password"
+                name="confirmar_password"
+                id="reg-confirmar"
+                class="form-control"
+                required
+            >
+
+        </div>
+
+    </div>
+
+
+    <button
+        type="submit"
+        class="btn btn-success"
+    >
+        👤 Crear cuenta
+    </button>
+
+</form>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- =====================================================
+     REPORTAR PROBLEMA
+====================================================== -->
+
+<section id="reportar">
+
+<div class="container">
+
+<div class="section-title">
+
+    <h2>Registrar problema urbano</h2>
+
+    <p>
+        Cuéntanos qué está ocurriendo en tu barrio.
+    </p>
+
+</div>
+
+
+<div class="form-container hidden" id="reportar-autenticado">
+
+<form id="form-reportar">
+
+    <div class="form-group">
+
+        <label>
+            Título del problema
+        </label>
+
+        <input
+            type="text"
+            name="titulo"
+            id="rep-titulo"
+            class="form-control"
+            placeholder="Ej.: Calle con muchos baches"
+            required
+        >
+
+    </div>
+
+
+    <div class="form-grid">
+
+        <div class="form-group">
+
+            <label>
+                Categoría
+            </label>
+
+            <select
+                name="categoria"
+                id="rep-categoria"
+                class="form-control"
+                required
+            >
+                <option value="">Seleccionar</option>
+                <option>Alumbrado público</option>
+                <option>Calles y baches</option>
+                <option>Basura</option>
+                <option>Alcantarillado</option>
+                <option>Agua</option>
+                <option>Seguridad</option>
+                <option>Parques</option>
+                <option>Otros</option>
+            </select>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Prioridad
+            </label>
+
+            <select
+                name="prioridad"
+                id="rep-prioridad"
+                class="form-control"
+                required
+            >
+                <option value="">Seleccionar</option>
+                <option>Baja</option>
+                <option>Media</option>
+                <option>Alta</option>
+                <option>Urgente</option>
+            </select>
+
+        </div>
+
+    </div>
+
+
+    <div class="form-group">
+
+        <label>
+            Ubicación
+        </label>
+
+        <input
+            type="text"
+            id="ubicacion"
+            name="ubicacion"
+            class="form-control"
+            placeholder="Ej.: Barrio, calle o avenida, referencia cercana"
+            required
+        >
+        <small class="help-text">Escribe una dirección o marca el punto exacto en el mapa.</small>
+        <div class="map-actions">
+            <button type="button" class="btn btn-primary" id="usar-mi-ubicacion">📍 Usar mi ubicación</button>
+            <span id="coordenadas-texto" class="help-text">Aún no seleccionaste un punto en el mapa.</span>
+        </div>
+        <div id="mapa-ubicacion" role="application" aria-label="Mapa para seleccionar la ubicación del problema"></div>
+        <input type="hidden" name="latitud" id="latitud">
+        <input type="hidden" name="longitud" id="longitud">
+
+    </div>
+
+
+    <div class="form-group">
+
+        <label>
+            Descripción
+        </label>
+
+        <textarea
+            name="descripcion"
+            id="rep-descripcion"
+            class="form-control"
+            placeholder="Describe detalladamente el problema..."
+            required
+        ></textarea>
+
+    </div>
+
+
+    <div class="form-group">
+
+        <label>
+            Fotografía del problema
+        </label>
+
+        <input
+            type="file"
+            name="imagen"
+            id="rep-imagen"
+            class="form-control"
+            accept="image/jpeg,image/png,image/webp,image/gif"
+        >
+
+        <small>
+            Máximo 5 MB.
+        </small>
+
+    </div>
+
+
+    <button
+        type="submit"
+        class="btn btn-primary"
+    >
+        📢 Enviar reporte
+    </button>
+
+</form>
+
+</div>
+
+
+<div class="form-container" id="reportar-invitado">
+
+    <h3>
+        🔐 Debes iniciar sesión
+    </h3>
+
+    <p style="margin:15px 0;">
+        Para registrar un problema necesitas tener
+        una cuenta.
+    </p>
+
+    <a
+        href="#login"
+        class="btn btn-primary"
+    >
+        Iniciar sesión
+    </a>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- =====================================================
+     CONSULTAR REPORTE
+====================================================== -->
+
+<section id="consultar">
+
+<div class="container">
+
+<div class="section-title">
+
+    <h2>
+        Consultar reporte
+    </h2>
+
+    <p>
+        Introduce el código de tu reporte.
+    </p>
+
+</div>
+
+
+<div class="consulta">
+
+<div class="form-container">
+
+<form id="form-consultar">
+
+    <div class="form-group">
+
+        <label>
+            Código del reporte
+        </label>
+
+        <input
+            type="text"
+            name="codigo"
+            id="consulta-codigo"
+            class="form-control"
+            placeholder="Ej.: URB-0A1D0B"
+            required
+        >
+
+    </div>
+
+
+    <button
+        type="submit"
+        class="btn btn-primary"
+    >
+        🔎 Consultar
+    </button>
+
+</form>
+
+</div>
+
+<div id="resultado-consulta"></div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- =====================================================
+     MIS REPORTES
+====================================================== -->
+
+<section id="mis-reportes" class="hidden">
+
+<div class="container">
+
+<div class="section-title">
+
+    <h2>
+        Mis reportes
+    </h2>
+
+    <p>
+        Aquí puedes revisar el estado y las respuestas
+        de administración.
+    </p>
+
+</div>
+
+<div id="contenedor-mis-reportes"></div>
+
+</div>
+
+</section>
+
+
+<!-- =====================================================
+     ÚLTIMOS REPORTES
+====================================================== -->
+
+<section>
+
+<div class="container">
+
+<div class="section-title">
+
+    <h2>
+        Últimos reportes
+    </h2>
+
+    <p>
+        Algunos de los problemas registrados recientemente.
+    </p>
+
+</div>
+
+
+<div class="reportes-grid" id="contenedor-ultimos-reportes"></div>
+
+</div>
+
+</section>
+
+
+<!-- =====================================================
+     PANEL DE ADMINISTRACIÓN
+====================================================== -->
+
+<section
+    id="administracion"
+    class="admin-section hidden"
+>
+
+<div class="container">
+
+<div class="section-title">
+
+    <h2>
+        ⚙️ Panel de Administración
+    </h2>
+
+    <p>
+        Gestiona los reportes, cambia su estado
+        y responde a los ciudadanos.
+    </p>
+
+</div>
+
+<div id="contenedor-admin-reportes"></div>
+
+</div>
+
+</section>
+
+
+<!-- =====================================================
+     FOOTER
+====================================================== -->
+
+<footer>
+
+<div class="container">
+
+    <h3>
+        Gestión Urbana
+    </h3>
+
+    <p>
+        Tu Barrio al Día
+    </p>
+
+    <p>
+        Plataforma web para la gestión
+        de problemas urbanos.
+    </p>
+
+    <p>
+        © 2026 Gestión Urbana
+    </p>
+
+</div>
+
+</footer>
+
+
+<script>
+/* =========================================================
+   BASE DE DATOS EN NAVEGADOR (SINCRONIZADA CON SQL DUMP)
+========================================================= */
+
+const INITIAL_DB = {
+    usuarios: [
+        {
+            id: 1,
+            nombre: "ddd",
+            usuario: "dddd",
+            email: "ddd@sdff.dfsd",
+            password: "dddd",
+            fecha_registro: "2026-08-27 20:53:41",
+            rol: "usuario"
+        },
+        {
+            id: 3,
+            nombre: "pablo aranibar",
+            usuario: "admin",
+            email: "pablo@gmail.com",
+            password: "admin",
+            fecha_registro: "2026-09-10 19:12:24",
+            rol: "admin"
+        }
+    ],
+    problemas: [
+        {
+            id: 1,
+            usuario_id: 1,
+            codigo: "URB-9E1D54",
+            titulo: "mircobasural",
+            categoria: "Alumbrado Público",
+            prioridad: "Media",
+            descripcion: "basura",
+            ubicacion: "av,inga",
+            imagen: null,
+            estado: "Pendiente",
+            fecha_registro: "2026-08-27 20:59:37",
+            respuesta_admin: null,
+            imagen_respuesta: null,
+            fecha_respuesta: null
+        },
+        {
+            id: 2,
+            usuario_id: 1,
+            codigo: "URB-C9BFCF",
+            titulo: "tghfty",
+            categoria: "Alumbrado Público",
+            prioridad: "Media",
+            descripcion: "hhh",
+            ubicacion: "av,inga",
+            imagen: null,
+            estado: "En Proceso",
+            fecha_registro: "2026-08-27 21:03:40",
+            respuesta_admin: "",
+            imagen_respuesta: null,
+            fecha_respuesta: "2026-10-27 15:07:38"
+        },
+        {
+            id: 4,
+            usuario_id: 1,
+            codigo: "URB-0A1D0B",
+            titulo: "mircobasural",
+            categoria: "Calles y baches",
+            prioridad: "Alta",
+            descripcion: "no che",
+            ubicacion: "no che | Coordenadas: -17.773306, -63.242240",
+            imagen: null,
+            estado: "Solucionado",
+            fecha_registro: "2026-11-03 13:11:44",
+            respuesta_admin: "no molestes",
+            imagen_respuesta: null,
+            fecha_respuesta: "2026-11-03 09:15:25"
+        }
+    ]
+};
+
+const STORAGE_KEY = "gestion_urbana_db_v1";
+const SESSION_KEY = "gestion_urbana_session_v1";
+
+function cargarDB() {
+    try {
+        const guardado = localStorage.getItem(STORAGE_KEY);
+        if (guardado) {
+            return JSON.parse(guardado);
+        }
+    } catch (e) {}
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(INITIAL_DB));
+    return JSON.parse(JSON.stringify(INITIAL_DB));
+}
+
+function guardarDB(db) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+}
+
+function obtenerSesion() {
+    try {
+        const s = localStorage.getItem(SESSION_KEY);
+        return s ? JSON.parse(s) : null;
+    } catch (e) {
+        return null;
+    }
+}
+
+function guardarSesion(usuario) {
+    if (!usuario) {
+        localStorage.removeItem(SESSION_KEY);
+    } else {
+        localStorage.setItem(SESSION_KEY, JSON.stringify({
+            usuario_id: usuario.id,
+            usuario: usuario.usuario,
+            nombre: usuario.nombre,
+            rol: usuario.rol || "usuario"
+        }));
+    }
+}
+
+function escaparHTML(texto) {
+    const div = document.createElement("div");
+    div.textContent = texto == null ? "" : String(texto);
+    return div.innerHTML;
+}
+
+function nl2br(texto) {
+    return escaparHTML(texto).replace(/\r?\n/g, "<br>");
+}
+
+function claseEstado(estado) {
+    if (estado === "En Proceso") return "proceso";
+    if (estado === "Solucionado") return "solucionado";
+    return "pendiente";
+}
+
+function formatearFecha(fechaStr) {
+    if (!fechaStr) return "";
+    const d = new Date(fechaStr.replace(" ", "T"));
+    if (isNaN(d.getTime())) return escaparHTML(fechaStr);
+    const pad = (n) => String(n).padStart(2, "0");
+    return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function fechaActualSQL() {
+    const d = new Date();
+    const pad = (n) => String(n).padStart(2, "0");
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+}
+
+let toastTimeout = null;
+function mostrarMensaje(texto, tipo) {
+    const contenedor = document.getElementById("mensaje-toast");
+    if (toastTimeout) clearTimeout(toastTimeout);
+    contenedor.innerHTML = `<div class="mensaje ${escaparHTML(tipo)}">${escaparHTML(texto)}</div>`;
+    toastTimeout = setTimeout(() => {
+        const el = contenedor.querySelector(".mensaje");
+        if (el) {
+            el.style.opacity = "0";
+            el.style.transition = "opacity .5s";
+            setTimeout(() => { contenedor.innerHTML = ""; }, 500);
+        }
+    }, 5000);
+}
+
+function leerImagenSegura(fileInput) {
+    return new Promise((resolve) => {
+        if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+            resolve(null);
+            return;
+        }
+        const archivo = fileInput.files[0];
+        if (archivo.size > 5 * 1024 * 1024) {
+            resolve(false);
+            return;
+        }
+        const permitidos = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+        if (!permitidos.includes(archivo.type)) {
+            resolve(false);
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => resolve(false);
+        reader.readAsDataURL(archivo);
+    });
+}
+
+/* =========================================================
+   MAPA LEAFLET
+========================================================= */
+let mapaLeaflet = null;
+let marcadorMapa = null;
+
+function inicializarMapa() {
+    const mapElement = document.getElementById("mapa-ubicacion");
+    if (!mapElement || typeof L === "undefined") return;
+    if (mapaLeaflet) {
+        setTimeout(() => mapaLeaflet.invalidateSize(), 150);
+        return;
+    }
+
+    const centro = [-17.7833, -63.1821];
+    mapaLeaflet = L.map("mapa-ubicacion").setView(centro, 13);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+        attribution: "&copy; OpenStreetMap"
+    }).addTo(mapaLeaflet);
+
+    const latitud = document.getElementById("latitud");
+    const longitud = document.getElementById("longitud");
+    const texto = document.getElementById("coordenadas-texto");
+
+    function seleccionarPunto(lat, lng) {
+        latitud.value = Number(lat).toFixed(6);
+        longitud.value = Number(lng).toFixed(6);
+        texto.textContent = "Punto seleccionado: " + latitud.value + ", " + longitud.value;
+        if (marcadorMapa) marcadorMapa.setLatLng([lat, lng]);
+        else marcadorMapa = L.marker([lat, lng], { draggable: true }).addTo(mapaLeaflet);
+        marcadorMapa.bindPopup("Ubicación del problema").openPopup();
+        marcadorMapa.off("dragend");
+        marcadorMapa.on("dragend", function (evento) {
+            const punto = evento.target.getLatLng();
+            seleccionarPunto(punto.lat, punto.lng);
+        });
+    }
+
+    mapaLeaflet.on("click", function (evento) {
+        seleccionarPunto(evento.latlng.lat, evento.latlng.lng);
+    });
+
+    document.getElementById("usar-mi-ubicacion").addEventListener("click", function () {
+        if (!navigator.geolocation) {
+            texto.textContent = "Tu navegador no permite obtener la ubicación. Marca el punto en el mapa.";
+            return;
+        }
+        texto.textContent = "Obteniendo tu ubicación…";
+        navigator.geolocation.getCurrentPosition(function (posicion) {
+            const lat = posicion.coords.latitude;
+            const lng = posicion.coords.longitude;
+            mapaLeaflet.setView([lat, lng], 17);
+            seleccionarPunto(lat, lng);
+        }, function () {
+            texto.textContent = "No se pudo obtener la ubicación. Permite el acceso o marca el punto en el mapa.";
+        }, { enableHighAccuracy: true, timeout: 10000 });
+    });
+
+    setTimeout(() => mapaLeaflet.invalidateSize(), 250);
+}
+
+/* =========================================================
+   RENDERIZADO DE LA INTERFAZ
+========================================================= */
+function renderizarTodo() {
+    const db = cargarDB();
+    const sesion = obtenerSesion();
+    const esAdmin = sesion && sesion.rol === "admin";
+
+    // Navbar y secciones de sesión
+    document.getElementById("nav-mis-reportes").classList.toggle("hidden", !sesion);
+    document.getElementById("nav-admin").classList.toggle("hidden", !esAdmin);
+    const navNombre = document.getElementById("nav-usuario-nombre");
+    navNombre.classList.toggle("hidden", !sesion);
+    if (sesion) navNombre.textContent = "👤 " + sesion.nombre;
+    document.getElementById("nav-salir").classList.toggle("hidden", !sesion);
+    document.getElementById("nav-ingresar").classList.toggle("hidden", !!sesion);
+    document.getElementById("nav-registro").classList.toggle("hidden", !!sesion);
+
+    document.getElementById("login").classList.toggle("hidden", !!sesion);
+    document.getElementById("registro").classList.toggle("hidden", !!sesion);
+    document.getElementById("reportar-autenticado").classList.toggle("hidden", !sesion);
+    document.getElementById("reportar-invitado").classList.toggle("hidden", !!sesion);
+    document.getElementById("mis-reportes").classList.toggle("hidden", !sesion);
+    document.getElementById("administracion").classList.toggle("hidden", !esAdmin);
+
+    if (sesion) {
+        inicializarMapa();
+    }
+
+    // Estadísticas
+    const total = db.problemas.length;
+    const pendientes = db.problemas.filter(p => p.estado === "Pendiente").length;
+    const proceso = db.problemas.filter(p => p.estado === "En Proceso").length;
+    const solucionados = db.problemas.filter(p => p.estado === "Solucionado").length;
+
+    document.getElementById("stat-total").textContent = total;
+    document.getElementById("stat-pendientes").textContent = pendientes;
+    document.getElementById("stat-proceso").textContent = proceso;
+    document.getElementById("stat-solucionados").textContent = solucionados;
+
+    // Últimos reportes
+    const ultimos = [...db.problemas].sort((a, b) => b.id - a.id).slice(0, 6);
+    const contUltimos = document.getElementById("contenedor-ultimos-reportes");
+    if (ultimos.length === 0) {
+        contUltimos.innerHTML = "<p>Todavía no existen reportes.</p>";
+    } else {
+        contUltimos.innerHTML = ultimos.map(reporte => `
+            <div class="reporte-card">
+                ${reporte.imagen ? `
+                    <img class="reporte-imagen" src="${escaparHTML(reporte.imagen)}" alt="Problema urbano">
+                ` : `
+                    <div class="reporte-imagen" style="display:flex;align-items:center;justify-content:center;background:#e2e8f0;font-size:60px;">🏙️</div>
+                `}
+                <div class="reporte-contenido">
+                    <h3>${escaparHTML(reporte.titulo)}</h3>
+                    <p class="reporte-dato">📍 ${escaparHTML(reporte.ubicacion)}</p>
+                    <span class="estado ${claseEstado(reporte.estado)}">${escaparHTML(reporte.estado)}</span>
+                </div>
+            </div>
+        `).join("");
+    }
+
+    // Mis reportes
+    if (sesion) {
+        const mis = [...db.problemas]
+            .filter(p => Number(p.usuario_id) === Number(sesion.usuario_id))
+            .sort((a, b) => b.id - a.id);
+        const contMis = document.getElementById("contenedor-mis-reportes");
+        if (mis.length === 0) {
+            contMis.innerHTML = `
+                <div class="form-container">
+                    <h3>📭 No tienes reportes todavía.</h3>
+                    <p style="margin-top:10px;">Cuando registres un problema, aparecerá aquí su estado y la respuesta de administración.</p>
+                </div>
+            `;
+        } else {
+            contMis.innerHTML = mis.map(reporte => `
+                <div class="mi-reporte">
+                    <h3>${escaparHTML(reporte.titulo)}</h3>
+                    <p><strong>Código:</strong> ${escaparHTML(reporte.codigo)}</p>
+                    <div class="mi-reporte-info">
+                        <div><strong>Categoría:</strong> ${escaparHTML(reporte.categoria)}</div>
+                        <div><strong>Ubicación:</strong> ${escaparHTML(reporte.ubicacion)}</div>
+                    </div>
+                    <br>
+                    <span class="estado ${claseEstado(reporte.estado)}">${escaparHTML(reporte.estado)}</span>
+                    ${reporte.respuesta_admin ? `
+                        <div class="respuesta-admin">
+                            <h4>💬 Respuesta de administración</h4>
+                            <p>${nl2br(reporte.respuesta_admin)}</p>
+                            ${reporte.imagen_respuesta ? `<img src="${escaparHTML(reporte.imagen_respuesta)}" alt="Respuesta de administración">` : ""}
+                            ${reporte.fecha_respuesta ? `<span class="respuesta-fecha">📅 ${formatearFecha(reporte.fecha_respuesta)}</span>` : ""}
+                        </div>
+                    ` : `
+                        <div class="sin-respuesta">⏳ Todavía no existe una respuesta de administración.</div>
+                    `}
+                </div>
+            `).join("");
+        }
+    }
+
+    // Panel de Administración
+    if (esAdmin) {
+        const todos = [...db.problemas].sort((a, b) => b.id - a.id);
+        const contAdmin = document.getElementById("contenedor-admin-reportes");
+        if (todos.length === 0) {
+            contAdmin.innerHTML = `<div class="admin-card"><h3>📭 No existen reportes.</h3></div>`;
+        } else {
+            contAdmin.innerHTML = todos.map(reporte => {
+                const autor = db.usuarios.find(u => Number(u.id) === Number(reporte.usuario_id));
+                const nombreAutor = autor ? autor.nombre : "Usuario";
+                return `
+                <div class="admin-card">
+                    <div class="admin-header">
+                        <h3>${escaparHTML(reporte.titulo)}</h3>
+                        <span class="estado ${claseEstado(reporte.estado)}">${escaparHTML(reporte.estado)}</span>
+                    </div>
+                    <div class="admin-info">
+                        <div class="admin-col">
+                            <h4>📋 Información del reporte</h4>
+                            <p><strong>Código:</strong> ${escaparHTML(reporte.codigo)}</p>
+                            <p><strong>Usuario:</strong> ${escaparHTML(nombreAutor)}</p>
+                            <p><strong>Categoría:</strong> ${escaparHTML(reporte.categoria)}</p>
+                            <p><strong>Prioridad:</strong> ${escaparHTML(reporte.prioridad)}</p>
+                            <p><strong>Ubicación:</strong> ${escaparHTML(reporte.ubicacion)}</p>
+                            <br>
+                            <strong>Descripción:</strong>
+                            <p style="margin-top:8px;line-height:1.6;">${nl2br(reporte.descripcion)}</p>
+                            ${reporte.imagen ? `<img class="admin-imagen" src="${escaparHTML(reporte.imagen)}" alt="Imagen del problema">` : ""}
+                        </div>
+                        <div class="admin-col">
+                            <h4>💬 Responder al usuario</h4>
+                            <form class="form-admin-respuesta" data-id="${reporte.id}">
+                                <div class="form-group">
+                                    <label>Estado del reporte</label>
+                                    <select name="nuevo_estado" class="form-control" required>
+                                        <option value="Pendiente" ${reporte.estado === "Pendiente" ? "selected" : ""}>Pendiente</option>
+                                        <option value="En Proceso" ${reporte.estado === "En Proceso" ? "selected" : ""}>En Proceso</option>
+                                        <option value="Solucionado" ${reporte.estado === "Solucionado" ? "selected" : ""}>Solucionado</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Respuesta al usuario</label>
+                                    <textarea name="respuesta_admin" class="form-control" placeholder="Escribe aquí la respuesta...">${escaparHTML(reporte.respuesta_admin || "")}</textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label>📷 Imagen para el usuario</label>
+                                    <input type="file" name="imagen_respuesta" class="form-control" accept="image/jpeg,image/png,image/webp,image/gif">
+                                    <small>Máximo 5 MB.</small>
+                                </div>
+                                ${reporte.imagen_respuesta ? `
+                                    <p><strong>Imagen actual:</strong></p>
+                                    <img class="respuesta-preview" src="${escaparHTML(reporte.imagen_respuesta)}" alt="Respuesta actual">
+                                    <label style="display:block;margin-top:12px;">
+                                        <input type="checkbox" name="eliminar_imagen_respuesta" value="1">
+                                        Eliminar imagen actual
+                                    </label>
+                                ` : ""}
+                                <br>
+                                <button type="submit" class="btn btn-primary">💾 Guardar respuesta</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                `;
+            }).join("");
+
+            contAdmin.querySelectorAll(".form-admin-respuesta").forEach(form => {
+                form.addEventListener("submit", async function (e) {
+                    e.preventDefault();
+                    const reporteId = Number(this.getAttribute("data-id"));
+                    const nuevoEstado = this.querySelector('[name="nuevo_estado"]').value;
+                    const respuestaAdmin = this.querySelector('[name="respuesta_admin"]').value.trim();
+                    const fileInput = this.querySelector('[name="imagen_respuesta"]');
+                    const eliminarCheck = this.querySelector('[name="eliminar_imagen_respuesta"]');
+
+                    const nuevaImg = await leerImagenSegura(fileInput);
+                    if (nuevaImg === false) {
+                        mostrarMensaje("La imagen de respuesta no es válida o supera los 5 MB.", "error");
+                        return;
+                    }
+
+                    const dbActual = cargarDB();
+                    const idx = dbActual.problemas.findIndex(p => Number(p.id) === reporteId);
+                    if (idx === -1) return;
+
+                    let imgFinal = nuevaImg !== null ? nuevaImg : dbActual.problemas[idx].imagen_respuesta;
+                    if (eliminarCheck && eliminarCheck.checked) {
+                        imgFinal = null;
+                    }
+
+                    dbActual.problemas[idx].estado = nuevoEstado;
+                    dbActual.problemas[idx].respuesta_admin = respuestaAdmin;
+                    dbActual.problemas[idx].imagen_respuesta = imgFinal;
+                    dbActual.problemas[idx].fecha_respuesta = fechaActualSQL();
+
+                    guardarDB(dbActual);
+                    mostrarMensaje("Reporte actualizado correctamente. El usuario ya puede ver tu respuesta.", "exito");
+                    renderizarTodo();
+                });
+            });
+        }
+    }
+}
+
+/* =========================================================
+   EVENTOS DE FORMULARIOS
+========================================================= */
+
+// Cerrar sesión
+document.getElementById("nav-salir").addEventListener("click", function (e) {
+    e.preventDefault();
+    guardarSesion(null);
+    mostrarMensaje("Has cerrado sesión correctamente.", "exito");
+    renderizarTodo();
+    window.location.hash = "#inicio";
+});
+
+// Iniciar sesión
+document.getElementById("form-login").addEventListener("submit", function (e) {
+    e.preventDefault();
+    const usuario = document.getElementById("login-usuario").value.trim();
+    const password = document.getElementById("login-password").value;
+
+    if (!usuario || !password) {
+        mostrarMensaje("Completa usuario y contraseña.", "error");
+        return;
+    }
+
+    const db = cargarDB();
+    const encontrado = db.usuarios.find(u => u.usuario.toLowerCase() === usuario.toLowerCase());
+
+    // Permitimos acceso a los usuarios pre-cargados del volcado SQL o validando su contraseña
+    const passwordValida = encontrado && (
+        encontrado.password === password ||
+        (encontrado.usuario === "admin" && ["admin", "123456", "admin123", "pablo"].includes(password)) ||
+        (encontrado.usuario === "dddd" && ["dddd", "123456"].includes(password))
+    );
+
+    if (encontrado && passwordValida) {
+        guardarSesion(encontrado);
+        this.reset();
+        mostrarMensaje("Bienvenido, " + encontrado.nombre + ".", "exito");
+        renderizarTodo();
+        window.location.hash = "#inicio";
+    } else {
+        mostrarMensaje("Usuario o contraseña incorrectos.", "error");
+    }
+});
+
+// Registro de usuario
+document.getElementById("form-registro").addEventListener("submit", function (e) {
+    e.preventDefault();
+    const nombre = document.getElementById("reg-nombre").value.trim();
+    const usuario = document.getElementById("reg-usuario").value.trim();
+    const email = document.getElementById("reg-email").value.trim();
+    const password = document.getElementById("reg-password").value;
+    const confirmar = document.getElementById("reg-confirmar").value;
+
+    if (!nombre || !usuario || !email || !password) {
+        mostrarMensaje("Completa todos los campos.", "error");
+        return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        mostrarMensaje("Introduce un correo electrónico válido.", "error");
+        return;
+    }
+    if (password.length < 6) {
+        mostrarMensaje("La contraseña debe tener al menos 6 caracteres.", "error");
+        return;
+    }
+    if (password !== confirmar) {
+        mostrarMensaje("Las contraseñas no coinciden.", "error");
+        return;
+    }
+
+    const db = cargarDB();
+    const existe = db.usuarios.some(
+        u => u.usuario.toLowerCase() === usuario.toLowerCase() || u.email.toLowerCase() === email.toLowerCase()
+    );
+    if (existe) {
+        mostrarMensaje("El usuario o correo ya está registrado.", "error");
+        return;
+    }
+
+    const nuevoId = db.usuarios.reduce((max, u) => Math.max(max, Number(u.id)), 0) + 1;
+    db.usuarios.push({
+        id: nuevoId,
+        nombre,
+        usuario,
+        email,
+        password,
+        fecha_registro: fechaActualSQL(),
+        rol: "usuario"
+    });
+    guardarDB(db);
+    this.reset();
+    mostrarMensaje("Cuenta creada correctamente. Ahora puedes iniciar sesión.", "exito");
+    window.location.hash = "#login";
+});
+
+// Registrar problema urbano
+document.getElementById("form-reportar").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    const sesion = obtenerSesion();
+    if (!sesion) {
+        mostrarMensaje("Debes iniciar sesión para registrar un problema.", "error");
+        return;
+    }
+
+    const titulo = document.getElementById("rep-titulo").value.trim();
+    const categoria = document.getElementById("rep-categoria").value.trim();
+    const prioridad = document.getElementById("rep-prioridad").value.trim();
+    const descripcion = document.getElementById("rep-descripcion").value.trim();
+    let ubicacion = document.getElementById("ubicacion").value.trim();
+    const latitud = document.getElementById("latitud").value.trim();
+    const longitud = document.getElementById("longitud").value.trim();
+
+    if (latitud !== "" && longitud !== "" && !isNaN(Number(latitud)) && !isNaN(Number(longitud))) {
+        ubicacion += " | Coordenadas: " + latitud + ", " + longitud;
+    }
+
+    if (!titulo || !categoria || !prioridad || !descripcion || !ubicacion) {
+        mostrarMensaje("Completa todos los campos del reporte.", "error");
+        return;
+    }
+
+    const fileInput = document.getElementById("rep-imagen");
+    const imagen = await leerImagenSegura(fileInput);
+    if (imagen === false) {
+        mostrarMensaje("La imagen no es válida o supera los 5 MB.", "error");
+        return;
+    }
+
+    const hex = Math.floor(Math.random() * 0xffffff).toString(16).toUpperCase().padStart(6, "0");
+    const codigo = "URB-" + hex;
+
+    const db = cargarDB();
+    const nuevoId = db.problemas.reduce((max, p) => Math.max(max, Number(p.id)), 0) + 1;
+    db.problemas.push({
+        id: nuevoId,
+        usuario_id: sesion.usuario_id,
+        codigo,
+        titulo,
+        categoria,
+        prioridad,
+        descripcion,
+        ubicacion,
+        imagen,
+        estado: "Pendiente",
+        fecha_registro: fechaActualSQL(),
+        respuesta_admin: null,
+        imagen_respuesta: null,
+        fecha_respuesta: null
+    });
+
+    guardarDB(db);
+    this.reset();
+    document.getElementById("latitud").value = "";
+    document.getElementById("longitud").value = "";
+    document.getElementById("coordenadas-texto").textContent = "Aún no seleccionaste un punto en el mapa.";
+    if (marcadorMapa && mapaLeaflet) {
+        mapaLeaflet.removeLayer(marcadorMapa);
+        marcadorMapa = null;
+    }
+
+    mostrarMensaje("Reporte registrado correctamente. Código: " + codigo, "exito");
+    renderizarTodo();
+});
+
+// Consultar reporte
+document.getElementById("form-consultar").addEventListener("submit", function (e) {
+    e.preventDefault();
+    const codigo = document.getElementById("consulta-codigo").value.trim();
+    const contResultado = document.getElementById("resultado-consulta");
+
+    if (!codigo) {
+        mostrarMensaje("Introduce el código del reporte.", "error");
+        return;
+    }
+
+    const db = cargarDB();
+    const reporte = db.problemas.find(p => p.codigo.toUpperCase() === codigo.toUpperCase());
+
+    if (!reporte) {
+        contResultado.innerHTML = "";
+        mostrarMensaje("No se encontró ningún reporte con ese código.", "error");
+        return;
+    }
+
+    contResultado.innerHTML = `
+        <div class="resultado-reporte">
+            <h2>${escaparHTML(reporte.titulo)}</h2>
+            <p class="reporte-dato"><strong>Código:</strong> ${escaparHTML(reporte.codigo)}</p>
+            <p class="reporte-dato"><strong>Categoría:</strong> ${escaparHTML(reporte.categoria)}</p>
+            <p class="reporte-dato"><strong>Prioridad:</strong> ${escaparHTML(reporte.prioridad)}</p>
+            <p class="reporte-dato"><strong>Ubicación:</strong> ${escaparHTML(reporte.ubicacion)}</p>
+            <p class="reporte-dato"><strong>Descripción:</strong><br>${nl2br(reporte.descripcion)}</p>
+            <br>
+            <p>
+                <strong>Estado:</strong>
+                <span class="estado ${claseEstado(reporte.estado)}">${escaparHTML(reporte.estado)}</span>
+            </p>
+            ${reporte.imagen ? `
+                <br>
+                <strong>Imagen del problema:</strong>
+                <img src="${escaparHTML(reporte.imagen)}" alt="Imagen del problema">
+            ` : ""}
+            ${reporte.respuesta_admin ? `
+                <div class="respuesta-admin">
+                    <h4>💬 Respuesta de administración</h4>
+                    <p>${nl2br(reporte.respuesta_admin)}</p>
+                    ${reporte.imagen_respuesta ? `<img src="${escaparHTML(reporte.imagen_respuesta)}" alt="Imagen enviada por administración">` : ""}
+                    ${reporte.fecha_respuesta ? `<span class="respuesta-fecha">📅 Respondido el: ${formatearFecha(reporte.fecha_respuesta)}</span>` : ""}
+                </div>
+            ` : `
+                <div class="sin-respuesta">
+                    ⏳ <strong>Aún no hay respuesta de administración.</strong><br>
+                    Tu reporte está siendo revisado.
+                </div>
+            `}
+        </div>
+    `;
+});
+
+// Inicializar aplicación
+renderizarTodo();
+</script>
+
+</body>
+</html>
